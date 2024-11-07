@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">TNTSApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="TODO">TODO</string>
+    <string name="default_web_client_id">567322222501-kko3phd2as3v6h65fndb0bkf6p62js52.apps.googleusercontent.com</string>
+    <string name="settings">Settings</string>
+    <string name="circle_button_text">Perform Action</string>
+    <string name="circle_button_description">This button performs a specific action</string>
+    <string name="tutorials">Tutorials</string>
+    <string name="classs">Class</string>
+    <string name="challenges">Challenges</string>
+    <string name="todo">TODO</string>
+    <string name="modules">Modules</string>
+    <string name="logout">Logout</string>
+    <string name="create_class">Create Class</string>
+    <string name="join_class">Join Class</string>
+    <string name="upload_file">Upload File</string>
+    <string name="play_video">Play Video</string>
+    <string name="class_code_label">Class Code: %1$s</string>
+    <string name="teacher_name_label">Teacher: %1$s</string>
+
+</resources>

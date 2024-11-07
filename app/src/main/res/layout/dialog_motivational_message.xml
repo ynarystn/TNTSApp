@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/dialog_background">
+
+    <TextView
+        android:id="@+id/tv_welcome_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Welcome future developer!\nAre you having trouble understanding coding? Struggling to comprehend CSS processes? Don't worry! This CSS Course Learning App is meant to help you learn CSS in an entertaining way. With entertaining games and extensive handouts, you'll learn the skills you need to build and develop websites easily. Good luck with your trip, Future Developer!"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:paddingBottom="16dp" />
+
+    <Button
+        android:id="@+id/btn_play_video"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/play_video"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/red"
+        android:textAllCaps="false"
+        android:padding="12dp" />
+
+    <VideoView
+        android:id="@+id/video_view"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:visibility="gone" />
+
+</LinearLayout>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Home"
+        android:id="@+id/home"
+        android:icon="@drawable/home_icon"/>
+    <item android:title="Modules"
+        android:id="@+id/modules"
+        android:icon="@drawable/baseline_collections_bookmark_24"/>
+    <item android:title="Tutorials"
+        android:id="@+id/tutorials"
+        android:icon="@drawable/tutorial_icon"/>
+    <item android:title="Challenges"
+        android:id="@+id/challenges"
+        android:icon="@drawable/challenge_icon"/>
+    <item android:title="Settings"
+        android:id="@+id/settings"
+        android:icon="@drawable/settings_icon"/>
+
+</menu>

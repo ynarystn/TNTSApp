@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "567322222501",
+    "project_id": "tntsmobileapp-master",
+    "storage_bucket": "tntsmobileapp-master.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567322222501:android:9f719fca37aee77ba5524c",
+        "android_client_info": {
+          "package_name": "com.example.TNTSMobileApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "567322222501-mob5p4htjumo8n4l6g5qfr526l1fe2ng.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.TNTSMobileApp",
+            "certificate_hash": "b87b97dcd74e3794861402fa7f9ff6f10bc8a362"
+          }
+        },
+        {
+          "client_id": "567322222501-kko3phd2as3v6h65fndb0bkf6p62js52.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0cogQw7b7l54xHVV8Tkm_xsKko3IDt7A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "567322222501-kko3phd2as3v6h65fndb0bkf6p62js52.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567322222501:android:f0267d7ccf344488a5524c",
+        "android_client_info": {
+          "package_name": "com.example.tntsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "567322222501-kko3phd2as3v6h65fndb0bkf6p62js52.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0cogQw7b7l54xHVV8Tkm_xsKko3IDt7A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "567322222501-kko3phd2as3v6h65fndb0bkf6p62js52.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <Button
+        android:id="@+id/btn_continue_with_google"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Continue with Google"
+        android:textColor="@android:color/black"
+        android:drawableLeft="@drawable/google_logo"
+        android:drawablePadding="8dp"
+        android:background="@drawable/button_continue_to_google_background"
+        android:textAllCaps="false"
+        android:padding="12dp"
+        android:layout_marginTop="8dp" />
+</LinearLayout>
