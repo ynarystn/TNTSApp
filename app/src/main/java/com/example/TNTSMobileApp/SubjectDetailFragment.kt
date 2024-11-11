@@ -1,6 +1,7 @@
 package com.example.TNTSMobileApp
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
@@ -12,16 +13,18 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class SubjectDetailFragment : Fragment() {
 
@@ -43,6 +46,11 @@ class SubjectDetailFragment : Fragment() {
         fabActivity = view.findViewById(R.id.fabActivity)
         fabActivity.setOnClickListener {
             createActivity()
+        }
+
+        view.findViewById<TextView>(R.id.firstLevel).setOnClickListener {
+            val newFragment = Home()
+            (activity as MainActivity).replaceFragment(newFragment)
         }
 
         return view
@@ -74,12 +82,7 @@ class SubjectDetailFragment : Fragment() {
             .whereEqualTo("code", classCode)
             .get()
             .addOnSuccessListener { classDocuments ->
-                if (classDocuments.isEmpty) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Class not found",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                if (classDocuments.isEmpty) { Toast.makeText(requireContext(), "Class not found", Toast.LENGTH_SHORT).show()
                     return@addOnSuccessListener
                 }
 
@@ -88,6 +91,7 @@ class SubjectDetailFragment : Fragment() {
 
                 firestore.collection("Activities")
                     .whereEqualTo("code", classCode)
+                    .orderBy("createdDate", Query.Direction.DESCENDING)
                     .get()
                     .addOnSuccessListener { activityDocuments ->
                         if (activityDocuments.isEmpty) {
@@ -103,28 +107,23 @@ class SubjectDetailFragment : Fragment() {
                         for (activityDocument in activityDocuments) {
                             val activityName = activityDocument.getString("activityName") ?: "N/A"
                             val teacherName = activityDocument.getString("createdByUserName") ?: "N/A"
-                            val cardView = createCardView(activityName, teacherName)
+                            val activityDesc = activityDocument.getString("activityDesc") ?: "N/A"
+                            val cardView = createCardView(activityName, teacherName, activityDesc)
                             cardContainer.addView(cardView)
                         }
                     }
-                    .addOnFailureListener { exception ->
-                        Toast.makeText(
-                            requireContext(),
-                            "Failed to load activities: ${exception.message}",
+                    .addOnFailureListener { exception -> Toast.makeText(requireContext(), "Failed to load activities: ${exception.message}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
             }
-            .addOnFailureListener { exception ->
-                Toast.makeText(
-                    requireContext(),
-                    "Failed to load class data: ${exception.message}",
+            .addOnFailureListener { exception -> Toast.makeText(requireContext(), "Failed to load class data: ${exception.message}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
     }
 
-    private fun createCardView(activityName: String, teacherName: String): CardView {
+    private fun createCardView(activityName: String, teacherName: String, activityDesc: String): CardView {
         val cardView = CardView(requireContext()).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -135,7 +134,7 @@ class SubjectDetailFragment : Fragment() {
             radius = 40f
             cardElevation = 5f
             setContentPadding(16, 16, 16, 16)
-            setCardBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+            setCardBackgroundColor(Color.parseColor("#FFEBEE"))
         }
 
         val layout = LinearLayout(requireContext()).apply {
@@ -166,10 +165,34 @@ class SubjectDetailFragment : Fragment() {
             setPadding(leftMargin, 0, 0, 0)
         }
 
+        val activityDescTextView = TextView(requireContext()).apply {
+            text = activityDesc
+            textSize = 12f
+            setTextColor(Color.BLACK)
+            setPadding(leftMargin, 0, 0, 0)
+        }
+
         // Add TextViews to layout, and layout to CardView
         layout.addView(activityNameTextView)
         layout.addView(teacherNameTextView)
+
         cardView.addView(layout)
+
+        //Set OnClickListener to display SubjectDetailFragment when clicked
+        cardView.setOnClickListener {
+            val code = arguments?.getString("code") ?: "N/A"
+            val subjectName = arguments?.getString("subjectName") ?: "N/A"
+            val newFragment = ActivityDetailFragment()
+            val bundle = Bundle().apply {
+                putString("activityName", activityName)
+                putString("teacherName", teacherName)
+                putString("activityDesc", activityDesc)
+                putString("subjectName", subjectName)
+                putString("code", code)
+            }
+            newFragment.arguments = bundle
+            (activity as MainActivity).replaceFragment(newFragment)
+        }
 
         return cardView
     }
@@ -294,7 +317,7 @@ class SubjectDetailFragment : Fragment() {
                     firestore.collection("Activities").add(activityInfo)
                         .addOnSuccessListener {
                             // After saving, create a new CardView with activityName and createdByUserName
-                            val newCardView = createCardView(activityName, createdByUserName)
+                            val newCardView = createCardView(activityName, createdByUserName, activityDesc)
                             cardContainer.addView(newCardView, 0)
 
                             Toast.makeText(requireContext(), "Activity Created Successfully", Toast.LENGTH_SHORT).show()
