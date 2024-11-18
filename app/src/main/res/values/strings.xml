@@ -19,6 +19,9 @@
     <string name="play_video">Play Video</string>
     <string name="class_code_label">Class Code: %1$s</string>
     <string name="teacher_name_label">Teacher: %1$s</string>
+    <string name="class_code">Class Code</string>
+    <string name="see_members">See Members</string>
+    <string name="leave_class">Leave Class</string>
 
 
 </resources>

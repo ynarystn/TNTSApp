@@ -1,6 +1,9 @@
 package com.example.TNTSMobileApp
 
 import android.app.AlertDialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -92,7 +95,7 @@ class Home : Fragment() {
                     val code = document.getString("code") ?: "N/A"
                     val members = document.get("members") as? List<Map<String, Any>>
                     if (members != null) {
-                        val userEntry = members.find { it["userId"] == currentUser }
+                        val userEntry = members.find { it["userId"] == currentUser && it["leaveDate"] == "" }
                         if (userEntry != null) {
                             val joinedDate = (userEntry["joinedDate"] as? Timestamp)?.toDate()
                             if (joinedDate != null) {
@@ -122,6 +125,7 @@ class Home : Fragment() {
             }
     }
 
+
     private fun createCardView(subjectName: String, section: String, code: String): CardView {
         val cardView = CardView(requireContext())
         cardView.layoutParams = LinearLayout.LayoutParams(
@@ -135,44 +139,70 @@ class Home : Fragment() {
         cardView.setContentPadding(16, 16, 16, 16)
         cardView.setCardBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.white))
 
-        // Create a layout inside the CardView for the TextViews
-        val layout = LinearLayout(requireContext()).apply {
-            orientation = LinearLayout.VERTICAL
+        // Horizontal layout to hold text and button
+        val horizontalLayout = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT // Fill parent height to allow vertical centering
+                LinearLayout.LayoutParams.MATCH_PARENT
             )
         }
-        val leftMargin = 25 // Set the left margin in pixels or use a dp conversion
+
+        // Vertical layout for the text views
+        val textLayout = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1f // Take up available space
+            )
+            setPadding(25, 0, 0, 0)
+        }
+
+        //val leftMargin = 25 // Set the left margin in pixels or use a dp conversion
 
         // Subject Name TextView
         val subjectNameTextView = TextView(requireContext()).apply {
             text = subjectName
             textSize = 14f
             setTextColor(Color.BLACK)
-            setPadding(leftMargin, 0, 0, 0) // Add left padding for margin effect
         }
         // Section TextView
         val sectionTextView = TextView(requireContext()).apply {
             text = section
             textSize = 12f
             setTextColor(Color.DKGRAY)
-            setPadding(leftMargin, 0, 0, 0) // Add left padding for margin effect
         }
         // Code TextView
         val codeTextView = TextView(requireContext()).apply {
             text = getString(R.string.class_code_label, code)  // Use string resource with placeholder
             textSize = 12f
             setTextColor(Color.DKGRAY)
-            setPadding(leftMargin, 0, 0, 0) // Add left padding for margin effect
         }
-        // Add TextViews to layout and layout to CardView
-        layout.addView(subjectNameTextView)
-        layout.addView(sectionTextView)
-        layout.addView(codeTextView)
-        cardView.addView(layout)
+        val button = Button(requireContext()).apply {
+            setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_more_vert_24, 0, 0, 0)
+            background = null
+            layoutParams = LinearLayout.LayoutParams(
+                130, // Set a specific width, e.g., 80 pixels
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
 
+        }
+
+        // Add TextViews to the text layout
+        textLayout.addView(subjectNameTextView)
+        textLayout.addView(sectionTextView)
+        textLayout.addView(codeTextView)
+
+        // Add text layout and button to horizontal layout
+        horizontalLayout.addView(textLayout)
+        horizontalLayout.addView(button)
+
+        // Add the horizontal layout to the card view
+        cardView.addView(horizontalLayout)
+        // Add TextViews to layout and layout to CardView
 
         // Set OnClickListener to display SubjectDetailFragment when clicked
         cardView.setOnClickListener {
@@ -183,6 +213,13 @@ class Home : Fragment() {
             }
             newFragment.arguments = bundle
             (activity as MainActivity).replaceFragment(newFragment)
+        }
+
+        button.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("code", code)
+            }
+            showBottomSheetMoreDialog(code)
         }
         return cardView
     }
@@ -229,6 +266,87 @@ class Home : Fragment() {
         }
     }
 
+    private fun showBottomSheetMoreDialog(code: String) {
+        // Create and show the BottomSheetDialog
+        val bottomSheetMoreDialog = BottomSheetDialog(requireContext())
+        val bottomSheetMoreView = layoutInflater.inflate(R.layout.class_more_layout, null)
+
+        bottomSheetMoreDialog.setContentView(bottomSheetMoreView)
+
+        // Handle button clicks inside the BottomSheetDialog
+        bottomSheetMoreView.findViewById<Button>(R.id.btnCopyClassCode).setOnClickListener { // Handle Create Class button click
+            // Copy the class code to the clipboard
+            val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Class Code", code)
+            clipboard.setPrimaryClip(clip)
+
+            // Show a confirmation message
+            Toast.makeText(requireContext(), "Class code copied to clipboard", Toast.LENGTH_SHORT).show()
+
+            bottomSheetMoreDialog.dismiss()
+        }
+        bottomSheetMoreView.findViewById<Button>(R.id.btnLeaveClass).setOnClickListener {
+            val currentUserId = auth.currentUser?.uid ?: ""
+
+            if (currentUserId.isNotEmpty()) {
+                // Create the confirmation dialog
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Leave Class")
+                    .setMessage("Are you sure you want to leave the class?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        // If the user confirms, proceed with leaving the class
+                        firestore.collection("Classes")
+                            .whereEqualTo("code", code) // Assuming `code` is the class code you're checking
+                            .get()
+                            .addOnSuccessListener { querySnapshot ->
+                                if (!querySnapshot.isEmpty) {
+                                    // If a matching class code is found, check the members field
+                                    val classDocument = querySnapshot.documents[0] // Assuming one matching document
+                                    val classId = classDocument.id // Get the document ID
+                                    val members = classDocument.get("members") as? MutableList<Map<String, Any>> ?: mutableListOf()
+
+                                    // Update leaveDate for the member
+                                    val updatedMembers = members.map { member ->
+                                        if (member["userId"] == currentUserId) {
+                                            member.toMutableMap().apply {
+                                                put("leaveDate", Timestamp.now()) // Set leaveDate to the current server timestamp
+                                                fetchData()  // Assuming fetchData() updates the UI or other data
+                                            }
+                                        } else {
+                                            member
+                                        }
+                                    }
+
+                                    // Update the members field in the Firestore document
+                                    firestore.collection("Classes").document(classId)
+                                        .update("members", updatedMembers)
+                                        .addOnSuccessListener {
+                                            Toast.makeText(requireContext(), "You left the Class", Toast.LENGTH_SHORT).show()
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Toast.makeText(requireContext(), "Failed to Leave Class: ${e.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                } else {
+                                    // If no matching class code is found
+                                    Toast.makeText(requireContext(), "Class Code does not match.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(requireContext(), "Error checking class code: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                    .setNegativeButton("No") { dialog, _ ->
+                        dialog.dismiss() // Dismiss the dialog if the user cancels
+                    }
+                    .show() // Display the dialog
+            } else {
+                Toast.makeText(requireContext(), "User not authenticated.", Toast.LENGTH_SHORT).show()
+            }
+            // Dismiss the dialog
+            bottomSheetMoreDialog.dismiss()
+        }
+        bottomSheetMoreDialog.show()
+    }
 
     private fun showBottomSheetDialog() {
         // Create and show the BottomSheetDialog
@@ -284,7 +402,8 @@ class Home : Fragment() {
                     "members" to arrayListOf(
                         hashMapOf(
                             "userId" to (auth.currentUser?.uid ?: ""),
-                            "joinedDate" to Timestamp.now() // Store joined date here
+                            "joinedDate" to Timestamp.now(), // Store joined date here
+                            "leaveDate" to ""
                         )
                     )
                 )
@@ -337,18 +456,14 @@ class Home : Fragment() {
             dialogView.findViewById<Button>(R.id.btnSubmitCode).setOnClickListener {
                 val classCode = dialogView.findViewById<EditText>(R.id.etClassCode).text.toString()
 
-                if (classCode.isEmpty()) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Please enter a class code",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                if (classCode.isEmpty()) { Toast.makeText(requireContext(), "Please enter a class code", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
 
                 val currentUserId = auth.currentUser?.uid ?: ""
                 val joinedDate = Timestamp.now()
                 val currentUserName = auth.currentUser?.displayName ?: ""
+                val leaveDate = ""
 
                 firestore.collection("Classes")
                     .whereEqualTo("code", classCode)
@@ -362,50 +477,69 @@ class Home : Fragment() {
                             val document = documents.documents[0]  // Get the first document
 
                             // Retrieve members as a list of maps, each containing userId and joinedDate
-                            val members =
-                                document.get("members") as? List<Map<String, Any>> ?: emptyList()
+                            val members = document.get("members") as? List<Map<String, Any>> ?: emptyList()
+                            val classId = document.id // Get the document ID
+                            val member = members.find { it["userId"] == currentUserId }
 
-                            // Check if the user is already a member
-                            val isMember = members.any { it["userId"] == currentUserId }
+                            if (member != null) {
+                                // Check the leaveDate for the member
+                                val currentLeaveDate = member["leaveDate"]
+                                if (currentLeaveDate == null) {
+                                    Toast.makeText(requireContext(), "You are already joined this class", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    // Update leaveDate to null (delete it) for the current member
+                                    val updatedMembers = members.map { m ->
+                                        if (m["userId"] == currentUserId) {
+                                            m.toMutableMap().apply {
+                                                put("leaveDate", "") // Remove the leaveDate field
+                                                fetchData()
+                                            }
+                                        } else {
+                                            m
+                                        }
+                                    }
+                                    firestore.collection("Classes")
+                                        .document(classId)
+                                        .update("members", updatedMembers)
+                                        .addOnSuccessListener {
+                                            Toast.makeText(requireContext(), "Rejoin the Class Successfully", Toast.LENGTH_SHORT).show()
+                                        }
+                                }
+                            }else {
+                                // If not a member, create a new member entry with userId and joinedDate
+                                val newMember = mapOf(
+                                    "userId" to currentUserId,
+                                    "joinedDate" to joinedDate,
+                                    "userName" to currentUserName,
+                                    "leaveDate" to leaveDate
+                                )
+                                // Add the new member to the members array in Firestore
+                                document.reference.update("members", FieldValue.arrayUnion(newMember))
+                                    .addOnSuccessListener {
+                                        // Retrieve class details to display in a CardView
+                                        val subjectName = document.getString("subjectName") ?: "Unknown"
+                                        val section = document.getString("section") ?: "Unknown"
+                                        val code = document.getString("code") ?: "Unknown"
 
-                            if (isMember) {
-                                Toast.makeText(requireContext(), "You are already joined this class", Toast.LENGTH_SHORT).show()
-                                return@addOnSuccessListener
+                                        // Call function to create and display a new CardView
+                                        val newCardView = createCardView(subjectName, section, code)
+                                        cardContainer.addView(newCardView, 0)
+
+                                        Toast.makeText(requireContext(), "Joined Class Successfully", Toast.LENGTH_SHORT).show()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    }
                             }
-                            // If not a member, create a new member entry with userId and joinedDate
-                            val newMember = mapOf(
-                                "userId" to currentUserId,
-                                "joinedDate" to joinedDate,
-                                "userName" to currentUserName
-                            )
-                            // Add the new member to the members array in Firestore
-                            document.reference.update("members", FieldValue.arrayUnion(newMember))
-                                .addOnSuccessListener {
-                                    // Retrieve class details to display in a CardView
-                                    val subjectName = document.getString("subjectName") ?: "Unknown"
-                                    val section = document.getString("section") ?: "Unknown"
-                                    val code = document.getString("code") ?: "Unknown"
-
-                                    // Call function to create and display a new CardView
-                                    val newCardView = createCardView(subjectName, section, code)
-                                    cardContainer.addView(newCardView, 0)
-
-                                    Toast.makeText(requireContext(), "Joined Class Successfully", Toast.LENGTH_SHORT).show()
-                                }
-                                .addOnFailureListener { e ->
-                                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                                }
                         }
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT)
                             .show()
                     }
-
                 // Dismiss the Join Class dialog
                 joinClassDialog.dismiss()
             }
-
             // Show the "Join Class" dialog
             joinClassDialog.show()
         }

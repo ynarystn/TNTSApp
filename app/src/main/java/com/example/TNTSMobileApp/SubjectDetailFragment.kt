@@ -1,7 +1,6 @@
 package com.example.TNTSMobileApp
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
@@ -11,15 +10,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
+import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.FragmentManager
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -137,12 +137,13 @@ class SubjectDetailFragment : Fragment() {
             setCardBackgroundColor(Color.parseColor("#FFEBEE"))
         }
 
+        // Create a layout inside the CardView for the TextViews
         val layout = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_VERTICAL
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
+                LinearLayout.LayoutParams.MATCH_PARENT // Fill parent height to allow vertical centering
             )
         }
 
@@ -169,13 +170,10 @@ class SubjectDetailFragment : Fragment() {
             text = activityDesc
             textSize = 12f
             setTextColor(Color.BLACK)
-            setPadding(leftMargin, 0, 0, 0)
         }
 
-        // Add TextViews to layout, and layout to CardView
         layout.addView(activityNameTextView)
         layout.addView(teacherNameTextView)
-
         cardView.addView(layout)
 
         //Set OnClickListener to display SubjectDetailFragment when clicked
@@ -336,7 +334,6 @@ class SubjectDetailFragment : Fragment() {
 
             createClassDialog.dismiss()
         }
-
         // Show the "Create Activity" dialog
         createClassDialog.show()
     }
