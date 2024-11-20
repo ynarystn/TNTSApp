@@ -1,16 +1,16 @@
 package com.example.TNTSMobileApp
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.firebase.auth.FirebaseAuth
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
 
-class Tutorials : Fragment() {
+class TBasicOperatingSystemGuidesFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var circleButton: ConstraintLayout
@@ -21,9 +21,27 @@ class Tutorials : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_tutorials, container, false)
-    }
+        val view = inflater.inflate(R.layout.fragment_t_basic_operating_system_guides, container, false)
 
+//        val circleButton: View = view.findViewById(R.id.circleButton)
+//
+//
+//        circleButton.setOnClickListener {
+//            // Create and show the dialog fragment
+//            val dialogFragment = LogoutDialogFragment.newInstance()
+//            dialogFragment.setAnchorView(circleButton) // Set the anchor view
+//            dialogFragment.show(childFragmentManager, "StudentDialog")
+//        }
+
+        val btnBack: View = view.findViewById(R.id.btnBack)
+
+        btnBack.setOnClickListener {
+            val newFragment = Tutorials() // Replace with your target fragment
+            (activity as MainActivity).replaceFragment(newFragment) // Call replaceFragment from MainActivity
+        }
+
+        return view
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -31,49 +49,6 @@ class Tutorials : Fragment() {
         circleButton = view.findViewById(R.id.circleButton)
         profilePicture = view.findViewById(R.id.profilePicture)
 
-        val circleButton: View = view.findViewById(R.id.circleButton)
-
-        circleButton.setOnClickListener {
-            // Create and show the dialog fragment
-            val dialogFragment = LogoutDialogFragment.newInstance()
-            dialogFragment.setAnchorView(circleButton) // Set the anchor view
-            dialogFragment.show(childFragmentManager, "StudentDialog")
-        }
-
-        val firstCardView: View = view.findViewById(R.id.firstCardView)
-
-        firstCardView.setOnClickListener {
-            // Use the replaceFragment method from MainActivity to navigate
-            val newFragment = TIntroductionHardwareFragment() // Replace with your target fragment
-            (activity as MainActivity).replaceFragment(newFragment) // Call replaceFragment from MainActivity
-        }
-
-        val secondCardView: View = view.findViewById(R.id.secondCardView)
-
-        secondCardView.setOnClickListener {
-            // Use the replaceFragment method from MainActivity to navigate
-            val newFragment = TBasicOperatingSystemGuidesFragment() // Replace with your target fragment
-            (activity as MainActivity).replaceFragment(newFragment) // Call replaceFragment from MainActivity
-        }
-
-        val thirdCardView: View = view.findViewById(R.id.thirdCardView)
-
-        thirdCardView.setOnClickListener {
-            // Use the replaceFragment method from MainActivity to navigate
-            val newFragment = TIntroductionInHtmlFragment() // Replace with your target fragment
-            (activity as MainActivity).replaceFragment(newFragment) // Call replaceFragment from MainActivity
-        }
-
-        val fourthCardView: View = view.findViewById(R.id.fourthCardView)
-
-        fourthCardView.setOnClickListener {
-            // Use the replaceFragment method from MainActivity to navigate
-            val newFragment = TAdobePhotoshopFragment() // Replace with your target fragment
-            (activity as MainActivity).replaceFragment(newFragment) // Call replaceFragment from MainActivity
-        }
-
-
-        // Display user's profile information in the button
         displayUserProfile()
     }
 
@@ -112,3 +87,4 @@ class Tutorials : Fragment() {
         }
     }
 }
+

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Tutorials">
+    tools:context=".TBasicOperatingSystemGuidesFragment">
 
     <androidx.constraintlayout.widget.Guideline
         android:layout_width="wrap_content"
@@ -20,6 +20,37 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.90" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline_vertical2"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline_vertical3"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.20" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline_vertical4"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:src="@drawable/logo"
+        android:alpha="0.2"
+        android:layout_marginTop="70dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline_vertical"
+        app:layout_constraintEnd_toEndOf="@id/guideline_vertical1"
+        app:layout_constraintBottom_toTopOf="parent"/>
 
     <View
         android:id="@+id/whiteRectangle"
@@ -30,39 +61,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Path navigation (Breadcrumbs) -->
-    <LinearLayout
-        android:id="@+id/pathNavigation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="45dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guideline_vertical">
-
-        <TextView
-            android:id="@+id/firstLevel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tutorials"
-            android:textColor="@android:color/black"
-            android:textSize="12sp"
-            android:clickable="true"
-            android:focusable="true"/>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/classText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/tutorials"
-        android:textColor="#000000"
-        android:textSize="25sp"
-        android:fontFamily="@font/crimson_text_semibold"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="@+id/guideline_vertical"
-        app:layout_constraintTop_toBottomOf="@+id/whiteRectangle" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/circleButton"
@@ -87,17 +85,16 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageView
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/TODO"
-        android:src="@drawable/logo"
-        android:alpha="0.2"
-        android:layout_marginTop="70dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/guideline_vertical"
-        app:layout_constraintEnd_toEndOf="@id/guideline_vertical1"
-        app:layout_constraintBottom_toTopOf="parent"/>
+    <TextView
+        android:id="@+id/classText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Operating System"
+        android:textColor="#000000"
+        android:textSize="25sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline_vertical"
+        app:layout_constraintTop_toBottomOf="@+id/whiteRectangle" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/firstCardView"
@@ -117,10 +114,10 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/introductionInHardware"
+                android:id="@+id/introductionInOperatingSystem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Introduction in Hardware"
+                android:text="Introduction in Operating System"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -149,10 +146,10 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/basicOperatingSystemGuides"
+                android:id="@+id/importanceOfOperatingSystem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Basic Operating System Guides"
+                android:text="Importance Of Operating System"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -181,10 +178,10 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/introductionInHTML"
+                android:id="@+id/usesOfOperatingSystem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Introduction in HTML"
+                android:text="Uses of Operating System"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -213,10 +210,10 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/adobePhotoshop"
+                android:id="@+id/howToInstallOperatingSystem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Adobe Photoshop"
+                android:text="How to install Operating System"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -226,6 +223,17 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_arrow_back_24"
+        android:background="@color/fui_transparent"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="@id/guideline_vertical4"
+        app:layout_constraintEnd_toEndOf="@id/guideline_vertical3"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
