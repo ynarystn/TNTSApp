@@ -8,7 +8,11 @@ import android.view.ViewGroup
 import com.google.firebase.auth.FirebaseAuth
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
 class Modules : Fragment() {
 
@@ -31,9 +35,45 @@ class Modules : Fragment() {
         circleButton = view.findViewById(R.id.circleButton)
         profilePicture = view.findViewById(R.id.profilePicture)
 
+        val circleButton: View = view.findViewById(R.id.circleButton)
+
+        circleButton.setOnClickListener {
+            // Create and show the dialog fragment
+            val dialogFragment = LogoutDialogFragment.newInstance()
+            dialogFragment.setAnchorView(circleButton) // Set the anchor view
+            dialogFragment.show(childFragmentManager, "StudentDialog")
+        }
+
+        // ViewPager
+        val viewPager: ViewPager2 = view.findViewById(R.id.viewPager)
+        val tabLayout: TabLayout = view.findViewById(R.id.tabLayout)
+
+        viewPager.adapter = VPAdapter(this)
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            when (position) {
+                0 -> tab.text = "Grade 8"
+                1 -> tab.text = "Grade 9"
+                2 -> tab.text = "Grade 10"
+            }
+        }.attach()
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                tab.view.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.popup_bg)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+                tab.view.background = null // Remove background if needed
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
         // Display user's profile information in the button
         displayUserProfile()
     }
+
 
     private fun displayUserProfile() {
         val currentUser = auth.currentUser

@@ -22,6 +22,8 @@ import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.Timestamp
@@ -275,16 +277,21 @@ class Home : Fragment() {
 
         // Handle button clicks inside the BottomSheetDialog
         bottomSheetMoreView.findViewById<Button>(R.id.btnCopyClassCode).setOnClickListener { // Handle Create Class button click
-            // Copy the class code to the clipboard
-            val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("Class Code", code)
-            clipboard.setPrimaryClip(clip)
+                // Copy the class code to the clipboard
+                val clipboard =
+                    requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("Class Code", code)
+                clipboard.setPrimaryClip(clip)
 
-            // Show a confirmation message
-            Toast.makeText(requireContext(), "Class code copied to clipboard", Toast.LENGTH_SHORT).show()
+                // Show a confirmation message
+                Toast.makeText(
+                    requireContext(),
+                    "Class code copied to clipboard",
+                    Toast.LENGTH_SHORT
+                ).show()
 
-            bottomSheetMoreDialog.dismiss()
-        }
+                bottomSheetMoreDialog.dismiss()
+            }
         bottomSheetMoreView.findViewById<Button>(R.id.btnLeaveClass).setOnClickListener {
             val currentUserId = auth.currentUser?.uid ?: ""
 
@@ -296,20 +303,29 @@ class Home : Fragment() {
                     .setPositiveButton("Yes") { _, _ ->
                         // If the user confirms, proceed with leaving the class
                         firestore.collection("Classes")
-                            .whereEqualTo("code", code) // Assuming `code` is the class code you're checking
+                            .whereEqualTo(
+                                "code",
+                                code
+                            ) // Assuming `code` is the class code you're checking
                             .get()
                             .addOnSuccessListener { querySnapshot ->
                                 if (!querySnapshot.isEmpty) {
                                     // If a matching class code is found, check the members field
-                                    val classDocument = querySnapshot.documents[0] // Assuming one matching document
+                                    val classDocument =
+                                        querySnapshot.documents[0] // Assuming one matching document
                                     val classId = classDocument.id // Get the document ID
-                                    val members = classDocument.get("members") as? MutableList<Map<String, Any>> ?: mutableListOf()
+                                    val members =
+                                        classDocument.get("members") as? MutableList<Map<String, Any>>
+                                            ?: mutableListOf()
 
                                     // Update leaveDate for the member
                                     val updatedMembers = members.map { member ->
                                         if (member["userId"] == currentUserId) {
                                             member.toMutableMap().apply {
-                                                put("leaveDate", Timestamp.now()) // Set leaveDate to the current server timestamp
+                                                put(
+                                                    "leaveDate",
+                                                    Timestamp.now()
+                                                ) // Set leaveDate to the current server timestamp
                                                 fetchData()  // Assuming fetchData() updates the UI or other data
                                             }
                                         } else {
@@ -321,18 +337,34 @@ class Home : Fragment() {
                                     firestore.collection("Classes").document(classId)
                                         .update("members", updatedMembers)
                                         .addOnSuccessListener {
-                                            Toast.makeText(requireContext(), "You left the Class", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "You left the Class",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                         .addOnFailureListener { e ->
-                                            Toast.makeText(requireContext(), "Failed to Leave Class: ${e.message}", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Failed to Leave Class: ${e.message}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                 } else {
                                     // If no matching class code is found
-                                    Toast.makeText(requireContext(), "Class Code does not match.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Class Code does not match.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
                             .addOnFailureListener { e ->
-                                Toast.makeText(requireContext(), "Error checking class code: ${e.message}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Error checking class code: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                     }
                     .setNegativeButton("No") { dialog, _ ->
@@ -340,13 +372,68 @@ class Home : Fragment() {
                     }
                     .show() // Display the dialog
             } else {
-                Toast.makeText(requireContext(), "User not authenticated.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "User not authenticated.", Toast.LENGTH_SHORT)
+                    .show()
             }
             // Dismiss the dialog
             bottomSheetMoreDialog.dismiss()
         }
+        bottomSheetMoreView.findViewById<Button>(R.id.btnSeeMembers).setOnClickListener {
+                firestore.collection("Classes")
+                    .whereEqualTo("code", code)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        if (documents.isEmpty) {
+                            Toast.makeText(context, "No class found for this code.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            val membersList = mutableListOf<MembersAdapter.Member>()
+
+                            // Extract userId and userName from members
+                            for (document in documents) {
+                                val members = document.get("members") as? List<Map<String, Any>>
+                                    ?: emptyList()
+                                members.forEach { member ->
+                                    val userName = member["userName"] as? String ?: "Unknown"
+                                    val profilePictureUrl = member["profilePictureUrl"] as? String ?: ""
+                                    membersList.add(
+                                        MembersAdapter.Member(userName, profilePictureUrl)
+                                    )
+                                }
+                            }
+                            if (membersList.isEmpty()) {
+                                Toast.makeText(context, "No members found in this class.", Toast.LENGTH_SHORT).show()
+                            } else {
+                                showMembersDialog(membersList) // Show dialog with userIds.
+                            }
+                        }
+
+                        bottomSheetMoreDialog.dismiss()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(context, "Failed to fetch data: ${e.message}", Toast.LENGTH_SHORT).show()
+                        bottomSheetMoreDialog.dismiss()
+                    }
+
+            }
+
         bottomSheetMoreDialog.show()
     }
+
+    private fun showMembersDialog(members: List<MembersAdapter.Member>) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.see_members, null)
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerViewMembers)
+
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = MembersAdapter(members)
+
+        val dialogBuilder = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(true)
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
+    }
+
 
     private fun showBottomSheetDialog() {
         // Create and show the BottomSheetDialog
@@ -403,7 +490,9 @@ class Home : Fragment() {
                         hashMapOf(
                             "userId" to (auth.currentUser?.uid ?: ""),
                             "joinedDate" to Timestamp.now(), // Store joined date here
-                            "leaveDate" to ""
+                            "leaveDate" to "",
+                            "userName" to (auth.currentUser?.displayName ?: ""),
+                            "profilePictureUrl" to auth.currentUser?.photoUrl.toString()
                         )
                     )
                 )
@@ -464,6 +553,7 @@ class Home : Fragment() {
                 val joinedDate = Timestamp.now()
                 val currentUserName = auth.currentUser?.displayName ?: ""
                 val leaveDate = ""
+                val profilePictureUrl = auth.currentUser?.photoUrl.toString()
 
                 firestore.collection("Classes")
                     .whereEqualTo("code", classCode)
@@ -511,7 +601,8 @@ class Home : Fragment() {
                                     "userId" to currentUserId,
                                     "joinedDate" to joinedDate,
                                     "userName" to currentUserName,
-                                    "leaveDate" to leaveDate
+                                    "leaveDate" to leaveDate,
+                                    "profilePictureUrl" to profilePictureUrl
                                 )
                                 // Add the new member to the members array in Firestore
                                 document.reference.update("members", FieldValue.arrayUnion(newMember))

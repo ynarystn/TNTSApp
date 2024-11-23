@@ -22,6 +22,12 @@
     <string name="class_code">Class Code</string>
     <string name="see_members">See Members</string>
     <string name="leave_class">Leave Class</string>
+    <string name="quiz">Quiz</string>
+    <string name="_4_pic_1_word">4 Pic 1 Word</string>
+    <string name="teacher">Teacher</string>
+    <string name="user_name">User Name</string>
+    <string name="members">Members</string>
+    <string name="profile_picture">Profile Picture</string>
 
 
 </resources>
